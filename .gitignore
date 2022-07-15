@@ -1,0 +1,11 @@
+venv/*
+venv
+**/*.pyc
+*/**.pyc
+*/*.pyc
+*.pyc
+*/*/*.pyc
+.vscode
+.idea/
+*.out
+migrations
