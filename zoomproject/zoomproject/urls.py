@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from main.views import CallbackView
+from django.conf.urls.static import static
+from zoomproject import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/callback/', CallbackView.as_view(), name="callback-view")
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -123,6 +123,7 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672'
 CELERY_ACCEPT_CONTENT = ['application/json']
