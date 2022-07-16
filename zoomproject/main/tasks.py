@@ -2,6 +2,7 @@ from celery import shared_task
 from zoomproject.celery import app
 import json
 from main.models import Meeting, Participant
+import os
 
 file_name = "log.json"
 
@@ -128,6 +129,10 @@ def handle_queue(self, request_data):
         file_dict["breakout_room_uuid"] = meeting_info["breakout_room_uuid"]
         file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
         file_dict["participant_leave_time"] = meeting_info["participant"]["leave_time"]
+
+    elif request_data["event"] == "meeting.ended":
+        meeting_obj.end_time = meeting_info["end_time"]
+        meeting_obj.save()
 
     with open(file_name, "a") as file:
         file.write(f"{json.dumps(file_dict)}\n")

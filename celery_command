@@ -1,1 +1,1 @@
-celery -A zoomproject worker --loglevel=info -Q request_queue --concurrency=1 -n worker1@h
+nohup celery -A zoomproject worker --loglevel=info --logfile=worker.log -Q request_queue --concurrency=1 -n worker1@h &
