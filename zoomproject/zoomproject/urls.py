@@ -18,8 +18,9 @@ from django.urls import path
 from main.views import CallbackView
 from django.conf.urls.static import static
 from zoomproject import settings
+from django.views.decorators.csrf import csrf_exempt
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/callback/', CallbackView.as_view(), name="callback-view")
+    path('api/callback/', csrf_exempt(CallbackView.as_view()), name="callback-view")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

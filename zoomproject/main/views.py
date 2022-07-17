@@ -11,7 +11,7 @@ CONTENT_JSON = "application/json"
 class CallbackView(APIView):
 
     def get(self, request):
-        return Response(status=200)
+        return Response(data={"message": "success"}, status=200, content_type=CONTENT_JSON)
 
     def post(self, request):
         try:
