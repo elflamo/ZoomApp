@@ -6,7 +6,7 @@ import os
 
 file_name = "log.json"
 
-ADMIN_EMAIL = ["vertex@gmail.com"]
+ADMIN_EMAIL = ["vertexglobalservices@gmail.com", "rahul.bawa@vertexglobalservices.com"]
 
 
 def get_or_create_participant(meeting_info, meeting_obj):
@@ -14,7 +14,7 @@ def get_or_create_participant(meeting_info, meeting_obj):
     created = False
     recruiter = False
 
-    if ADMIN_EMAIL[0] in meeting_info["participant"]["email"]:
+    if meeting_info["participant"]["email"] in ADMIN_EMAIL:
         recruiter = True
 
     participant = Participant.objects.filter(
