@@ -21,5 +21,5 @@ from zoomproject import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('^api/callback$', CallbackView.as_view(), name="callback-view")
+    path('api/callback/', CallbackView.as_view(), name="callback-view")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
