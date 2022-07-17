@@ -10,6 +10,9 @@ CONTENT_JSON = "application/json"
 
 class CallbackView(APIView):
 
+    def get(self, request):
+        return Response(status=200)
+
     def post(self, request):
         try:
             handle_queue.apply_async(
