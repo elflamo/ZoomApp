@@ -28,6 +28,9 @@ class Meeting(CreatedModified):
     class Meta:
         db_table = "meeting"
 
+    def __repr__(self):
+        return f'{self.topic} {self.uuid}'
+
 
 class Participant(CreatedModified):
     participant_id = models.CharField(max_length=100, unique=True)

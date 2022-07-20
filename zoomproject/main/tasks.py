@@ -125,9 +125,14 @@ def handle_queue(self, request_data):
                 meeting_obj.active_participant_breakout_count += 1
             meeting_obj.save()
 
+            participant.join_time = meeting_info["participant"]["join_time"]
+            participant.in_breakout_room = True
+            participant.save()
+
             file_dict["breakout_room_uuid"] = meeting_info["breakout_room_uuid"]
             file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
             file_dict["participant_join_time"] = meeting_info["participant"]["join_time"]
+            file_dict["participant_leave_time"] = ""
 
         elif request_data["event"] == "meeting.participant_left_breakout_room":
 
@@ -139,8 +144,12 @@ def handle_queue(self, request_data):
                 meeting_obj.active_participant_breakout_count -= 1
             meeting_obj.save()
 
+            participant.leave_time = meeting_info["participant"]["leave_time"]
+            participant.save()
+
             file_dict["breakout_room_uuid"] = meeting_info["breakout_room_uuid"]
             file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
+            file_dict["participant_join_time"] = participant.join_time
             file_dict["participant_leave_time"] = meeting_info["participant"]["leave_time"]
 
         elif request_data["event"] == "meeting.ended":
