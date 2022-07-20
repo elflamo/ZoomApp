@@ -6,8 +6,7 @@ import os
 
 file_name = "log.json"
 
-# ADMIN_EMAIL = ["vertexglobalservices@gmail.com", "rahul.bawa@vertexglobalservices.com"]
-ADMIN_DOMAINS = ["@vertexglobalservices.com", "@vertexcosmos.com"]
+ADMIN_DOMAINS = ["vertexglobalservices.com", "vertexcosmos.com"]
 
 
 def get_or_create_participant(meeting_info, meeting_obj):
