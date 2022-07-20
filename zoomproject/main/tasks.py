@@ -79,6 +79,9 @@ def handle_queue(self, request_data):
                 duration=meeting_info["duration"]
             )
 
+        file_dict["meeting_topic"] = meeting_info["topic"]
+        file_dict["meeting_start_time"] = meeting_info["start_time"]
+
     elif request_data["event"] == "meeting.participant_joined":
 
         participant, created, recruiter = get_or_create_participant(meeting_info, meeting_obj)
@@ -135,6 +138,9 @@ def handle_queue(self, request_data):
     elif request_data["event"] == "meeting.ended":
         meeting_obj.end_time = meeting_info["end_time"]
         meeting_obj.save()
+
+        file_dict["meeting_topic"] = meeting_info["topic"]
+        file_dict["meeting_end_time"] = meeting_info["end_time"]
 
     with open(file_name, "a") as file:
         file.write(f"{json.dumps(file_dict)}\n")
