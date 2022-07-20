@@ -42,7 +42,6 @@ def prepare_participant_data(file_dict, meeting_info, meeting_obj):
     file_dict["meeting_topic"] = meeting_obj.topic
     file_dict["participant_user_id"] = meeting_info["participant"]["user_id"]
     file_dict["participant_user_name"] = meeting_info["participant"]["user_name"]
-    file_dict["participant_id"] = meeting_info["participant"]["id"]
     file_dict["participant_email"] = meeting_info["participant"]["email"]
     file_dict["active_participant_count"] = meeting_obj.active_participant_count
     file_dict["active_recruiter_count"] = meeting_obj.active_recruiter_count
