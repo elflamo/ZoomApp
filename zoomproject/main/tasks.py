@@ -20,7 +20,7 @@ def get_or_create_participant(meeting_info, meeting_obj):
         recruiter = True
 
     participant = Participant.objects.filter(
-        email=meeting_info["participant"]["email"],
+        name=meeting_info["participant"]["user_name"],
         meeting__uuid=meeting_info["uuid"]
     ).first()
 
@@ -38,6 +38,7 @@ def get_or_create_participant(meeting_info, meeting_obj):
 
 
 def prepare_participant_data(file_dict, meeting_info, meeting_obj):
+    file_dict["meeting_topic"] = meeting_obj.topic
     file_dict["participant_user_id"] = meeting_info["participant"]["user_id"]
     file_dict["participant_user_name"] = meeting_info["participant"]["user_name"]
     file_dict["participant_id"] = meeting_info["participant"]["id"]
