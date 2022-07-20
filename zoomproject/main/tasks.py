@@ -56,6 +56,7 @@ def handle_queue(self, request_data):
     try:
 
         print("EVENT: ", request_data["event"])
+        print("EVENT DATA: ", request_data)
         file_dict = dict()
         file_dict["event"] = request_data["event"]
         file_dict["event_ts"] = request_data["event_ts"]
