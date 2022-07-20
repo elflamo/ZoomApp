@@ -30,8 +30,9 @@ class Meeting(CreatedModified):
 
 
 class Participant(CreatedModified):
+    participant_id = models.CharField(max_length=20, unique=True)
     email = models.EmailField(null=True, blank=True)
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100, null=True, blank=True)
     meeting = models.ForeignKey(Meeting, on_delete=models.CASCADE)
     join_time = models.CharField(max_length=100)
     leave_time = models.CharField(max_length=100, null=True, blank=True)
