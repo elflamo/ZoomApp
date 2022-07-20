@@ -14,10 +14,10 @@ def get_or_create_participant(meeting_info, meeting_obj):
     created = False
     recruiter = False
 
-    participant_domain = meeting_info["participant"]["email"].split("@")[1]
-
-    if participant_domain in ADMIN_DOMAINS or meeting_info["participant"]["email"] == "vertexglobalservices@gmail.com":
-        recruiter = True
+    if meeting_info["participant"]["email"]:
+        participant_domain = meeting_info["participant"]["email"].split("@")[1]
+        if participant_domain in ADMIN_DOMAINS or meeting_info["participant"]["email"] == "vertexglobalservices@gmail.com":
+            recruiter = True
 
     participant = Participant.objects.filter(
         name=meeting_info["participant"]["user_name"],
