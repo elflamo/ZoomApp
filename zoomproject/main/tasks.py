@@ -94,6 +94,7 @@ def handle_queue(self, request_data):
 
         file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
         file_dict["participant_join_time"] = meeting_info["participant"]["join_time"]
+        file_dict["participant_leave_time"] = ""
 
     elif request_data["event"] == "meeting.participant_left":
 
@@ -104,8 +105,11 @@ def handle_queue(self, request_data):
             meeting_obj.active_participant_count -= 1
 
         meeting_obj.save()
+        participant.leave_time = meeting_info["participant"]["leave_time"]
+        participant.save()
         file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
         file_dict["participant_leave_time"] = meeting_info["participant"]["leave_time"]
+        file_dict["participant_join_time"] = participant.join_time
 
     elif request_data["event"] == "meeting.participant_joined_breakout_room":
 
