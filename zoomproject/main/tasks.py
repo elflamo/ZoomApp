@@ -53,102 +53,107 @@ def prepare_participant_data(file_dict, meeting_info, meeting_obj):
 @app.task(bind=True)
 def handle_queue(self, request_data):
     print(f'Request: {self.request.id}')
+    try:
 
-    file_dict = dict()
-    file_dict["event"] = request_data["event"]
-    file_dict["event_ts"] = request_data["event_ts"]
+        print("EVENT: ", request_data["event"])
+        file_dict = dict()
+        file_dict["event"] = request_data["event"]
+        file_dict["event_ts"] = request_data["event_ts"]
 
-    meeting_info = request_data["payload"]["object"]
+        meeting_info = request_data["payload"]["object"]
 
-    file_dict["meeting_uuid"] = meeting_info["uuid"]
-    file_dict["meeting_id"] = meeting_info["id"]
-    file_dict["meeting_duration"] = meeting_info["duration"]
-    file_dict["meeting_host_id"] = meeting_info["host_id"]
+        file_dict["meeting_uuid"] = meeting_info["uuid"]
+        file_dict["meeting_id"] = meeting_info["id"]
+        file_dict["meeting_duration"] = meeting_info["duration"]
+        file_dict["meeting_host_id"] = meeting_info["host_id"]
 
-    meeting_obj = Meeting.objects.filter(uuid=meeting_info["uuid"], meeting_id=meeting_info["id"]).first()
+        meeting_obj = Meeting.objects.filter(uuid=meeting_info["uuid"], meeting_id=meeting_info["id"]).first()
 
-    if request_data["event"] == "meeting.started":
+        if request_data["event"] == "meeting.started":
 
-        if meeting_obj is None:
-            meeting_obj = Meeting.objects.create(
-                uuid=meeting_info["uuid"],
-                meeting_id=meeting_info["id"],
-                host_id=meeting_info["host_id"],
-                account_id=request_data["payload"]["account_id"],
-                start_time=meeting_info["start_time"],
-                topic=meeting_info["topic"],
-                duration=meeting_info["duration"]
-            )
+            if meeting_obj is None:
+                meeting_obj = Meeting.objects.create(
+                    uuid=meeting_info["uuid"],
+                    meeting_id=meeting_info["id"],
+                    host_id=meeting_info["host_id"],
+                    account_id=request_data["payload"]["account_id"],
+                    start_time=meeting_info["start_time"],
+                    topic=meeting_info["topic"],
+                    duration=meeting_info["duration"]
+                )
 
-        file_dict["meeting_topic"] = meeting_info["topic"]
-        file_dict["meeting_start_time"] = meeting_info["start_time"]
+            file_dict["meeting_topic"] = meeting_info["topic"]
+            file_dict["meeting_start_time"] = meeting_info["start_time"]
 
-    elif request_data["event"] == "meeting.participant_joined":
+        elif request_data["event"] == "meeting.participant_joined":
 
-        participant, created, recruiter = get_or_create_participant(meeting_info, meeting_obj)
-        if created:
+            participant, created, recruiter = get_or_create_participant(meeting_info, meeting_obj)
+            if created:
+                if recruiter:
+                    meeting_obj.active_recruiter_count += 1
+                else:
+                    meeting_obj.active_participant_count += 1
+                meeting_obj.save()
+
+            file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
+            file_dict["participant_join_time"] = meeting_info["participant"]["join_time"]
+            file_dict["participant_leave_time"] = ""
+
+        elif request_data["event"] == "meeting.participant_left":
+
+            participant, created, recruiter = get_or_create_participant(meeting_info, meeting_obj)
             if recruiter:
-                meeting_obj.active_recruiter_count += 1
+                meeting_obj.active_recruiter_count -= 1
             else:
-                meeting_obj.active_participant_count += 1
+                meeting_obj.active_participant_count -= 1
+
+            meeting_obj.save()
+            participant.leave_time = meeting_info["participant"]["leave_time"]
+            participant.save()
+            file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
+            file_dict["participant_leave_time"] = meeting_info["participant"]["leave_time"]
+            file_dict["participant_join_time"] = participant.join_time
+
+        elif request_data["event"] == "meeting.participant_joined_breakout_room":
+
+            participant, created, recruiter = get_or_create_participant(meeting_info, meeting_obj)
+
+            if participant.is_recruiter:
+                meeting_obj.active_recruiter_breakout_count += 1
+            else:
+                meeting_obj.active_participant_breakout_count += 1
             meeting_obj.save()
 
-        file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
-        file_dict["participant_join_time"] = meeting_info["participant"]["join_time"]
-        file_dict["participant_leave_time"] = ""
+            file_dict["breakout_room_uuid"] = meeting_info["breakout_room_uuid"]
+            file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
+            file_dict["participant_join_time"] = meeting_info["participant"]["join_time"]
 
-    elif request_data["event"] == "meeting.participant_left":
+        elif request_data["event"] == "meeting.participant_left_breakout_room":
 
-        participant, created, recruiter = get_or_create_participant(meeting_info, meeting_obj)
-        if recruiter:
-            meeting_obj.active_recruiter_count -= 1
-        else:
-            meeting_obj.active_participant_count -= 1
+            participant, created, recruiter = get_or_create_participant(meeting_info, meeting_obj)
 
-        meeting_obj.save()
-        participant.leave_time = meeting_info["participant"]["leave_time"]
-        participant.save()
-        file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
-        file_dict["participant_leave_time"] = meeting_info["participant"]["leave_time"]
-        file_dict["participant_join_time"] = participant.join_time
+            if participant.is_recruiter:
+                meeting_obj.active_recruiter_breakout_count -= 1
+            else:
+                meeting_obj.active_participant_breakout_count -= 1
+            meeting_obj.save()
 
-    elif request_data["event"] == "meeting.participant_joined_breakout_room":
+            file_dict["breakout_room_uuid"] = meeting_info["breakout_room_uuid"]
+            file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
+            file_dict["participant_leave_time"] = meeting_info["participant"]["leave_time"]
 
-        participant, created, recruiter = get_or_create_participant(meeting_info, meeting_obj)
+        elif request_data["event"] == "meeting.ended":
+            meeting_obj.end_time = meeting_info["end_time"]
+            meeting_obj.save()
 
-        if participant.is_recruiter:
-            meeting_obj.active_recruiter_breakout_count += 1
-        else:
-            meeting_obj.active_participant_breakout_count += 1
-        meeting_obj.save()
+            file_dict["meeting_topic"] = meeting_info["topic"]
+            file_dict["meeting_end_time"] = meeting_info["end_time"]
 
-        file_dict["breakout_room_uuid"] = meeting_info["breakout_room_uuid"]
-        file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
-        file_dict["participant_join_time"] = meeting_info["participant"]["join_time"]
-
-    elif request_data["event"] == "meeting.participant_left_breakout_room":
-
-        participant, created, recruiter = get_or_create_participant(meeting_info, meeting_obj)
-
-        if participant.is_recruiter:
-            meeting_obj.active_recruiter_breakout_count -= 1
-        else:
-            meeting_obj.active_participant_breakout_count -= 1
-        meeting_obj.save()
-
-        file_dict["breakout_room_uuid"] = meeting_info["breakout_room_uuid"]
-        file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
-        file_dict["participant_leave_time"] = meeting_info["participant"]["leave_time"]
-
-    elif request_data["event"] == "meeting.ended":
-        meeting_obj.end_time = meeting_info["end_time"]
-        meeting_obj.save()
-
-        file_dict["meeting_topic"] = meeting_info["topic"]
-        file_dict["meeting_end_time"] = meeting_info["end_time"]
-
-    with open(file_name, "a") as file:
-        file.write(f"{json.dumps(file_dict)}\n")
-        file.close()
+        with open(file_name, "a") as file:
+            file.write(f"{json.dumps(file_dict)}\n")
+            file.close()
+    except Exception as exc:
+        print("Exception: ", exc)
+        print("Request data: ", request_data)
 
     print(f"Task completed: {self.request.id}")
