@@ -20,6 +20,9 @@ class CallbackView(APIView):
     def post(self, request):
         try:
             if request.data["event"] == "endpoint.url_validation":
+                sample_file = open("sample.txt", "w")
+                sample_file.write("1")
+                sample_file.close()
                 plain_token = request.data["payload"]["plainToken"]
                 digest = hmac.new(
                     TOKEN.encode("utf-8"),
