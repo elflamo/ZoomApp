@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main.models import Participant, Meeting
+from main.models import Participant, Meeting, Recruiter, ZoomToken
 
 
 class MeetingAdmin(admin.ModelAdmin):
@@ -17,3 +17,5 @@ class ParticipantsAdmin(admin.ModelAdmin):
 
 admin.site.register(Meeting, MeetingAdmin)
 admin.site.register(Participant, ParticipantsAdmin)
+admin.site.register(ZoomToken)
+admin.site.register(Recruiter)
