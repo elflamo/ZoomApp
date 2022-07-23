@@ -53,6 +53,9 @@ class ZoomToken(CreatedModified):
     class Meta:
         db_table = "zoomtoken"
 
+    def __repr__(self):
+        return f'Token: {self.token}'
+
 
 class Recruiter(CreatedModified):
 
@@ -60,3 +63,6 @@ class Recruiter(CreatedModified):
 
     class Meta:
         db_table = "recuiter"
+
+    def __repr__(self):
+        return f'Recruiter: {self.email}'
