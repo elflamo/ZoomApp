@@ -41,13 +41,13 @@ class CallbackView(APIView):
                 )
             else:
                 zoom_token = ZoomToken.objects.first().token
-                sample_file = open("headers.txt", "w")
-                sample_file.write(request.META.get('HTTP_AUTHORIZATION', 'None'))
-                sample_file.close()
-                handle_queue.apply_async(
-                    args=[request.data], queue="request_queue"
-                )
-                return Response(data={"message": "success"}, status=200, content_type=CONTENT_JSON)
+                if zoom_token == request.META.get('HTTP_AUTHORIZATION', None):
+                    handle_queue.apply_async(
+                        args=[request.data], queue="request_queue"
+                    )
+                    return Response(data={"message": "success"}, status=200, content_type=CONTENT_JSON)
+                else:
+                    return Response(data={"message": "Incorrect token"}, status=401, content_type=CONTENT_JSON)
         except Exception as exc:
             logger.exception("Exception: {}".format(str(exc)))
             return Response(data={"message": "success"}, status=400, content_type=CONTENT_JSON)
