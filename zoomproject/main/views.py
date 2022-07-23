@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 import logging
 from main.tasks import handle_queue
+from main.models import ZoomToken
 import hmac
 import hashlib
 import base64
@@ -9,7 +10,7 @@ import base64
 logger = logging.getLogger(__name__)
 
 CONTENT_JSON = "application/json"
-TOKEN = "JpQZyHhkQAGryrNboPFGhQ"
+TOKEN = "d3wGmFeXTl2b49fRoyhtaw"
 
 
 class CallbackView(APIView):
@@ -39,6 +40,10 @@ class CallbackView(APIView):
                     content_type=CONTENT_JSON
                 )
             else:
+                zoom_token = ZoomToken.objects.first().token
+                sample_file = open("headers.txt", "w")
+                sample_file.write(request.META.get('HTTP_AUTHORIZATION', 'None'))
+                sample_file.close()
                 handle_queue.apply_async(
                     args=[request.data], queue="request_queue"
                 )

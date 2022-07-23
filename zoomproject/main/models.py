@@ -44,3 +44,19 @@ class Participant(CreatedModified):
 
     class Meta:
         db_table = "participant"
+
+
+class ZoomToken(CreatedModified):
+
+    token = models.TextField()
+
+    class Meta:
+        db_table = "zoomtoken"
+
+
+class Recruiter(CreatedModified):
+
+    email = models.EmailField()
+
+    class Meta:
+        db_table = "recuiter"

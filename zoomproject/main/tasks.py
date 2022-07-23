@@ -1,8 +1,6 @@
-from celery import shared_task
 from zoomproject.celery import app
 import json
 from main.models import Meeting, Participant
-import os
 
 file_name = "log.json"
 
