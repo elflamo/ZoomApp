@@ -11,8 +11,13 @@ class MeetingAdmin(admin.ModelAdmin):
 
 class ParticipantsAdmin(admin.ModelAdmin):
     list_display = (
-        'participant_id', 'name', 'is_recruiter', 'in_breakout_room', 'meeting', 'join_time', 'leave_time'
+        'participant_id', 'name', 'is_recruiter', 'in_breakout_room', 'get_meeting', 'join_time', 'leave_time'
     )
+
+    def get_meeting(self, obj):
+        return f'{obj.meeting.topic} : {obj.meeting.meeting_id}'
+
+    get_meeting.short_description = 'Meeting'
 
 
 admin.site.register(Meeting, MeetingAdmin)
