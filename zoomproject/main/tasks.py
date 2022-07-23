@@ -166,5 +166,5 @@ def handle_queue(self, request_data):
             file.write(f"{exception_text}\n")
             file.close()
         print("Exception")
-
+    # datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S%fZ')
     print(f"Task completed: {self.request.id}")
