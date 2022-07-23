@@ -161,7 +161,10 @@ def handle_queue(self, request_data):
             file.write(f"{json.dumps(file_dict)}\n")
             file.close()
     except Exception as exc:
-        print("Exception: ", exc)
-        print("Request data: ", request_data)
+        exception_text = f"Request id: {self.request.id}, Exception: {exc}, Request Data: {request_data}"
+        with open("Exception.txt", "a") as file:
+            file.write(f"{exception_text}\n")
+            file.close()
+        print("Exception")
 
     print(f"Task completed: {self.request.id}")
