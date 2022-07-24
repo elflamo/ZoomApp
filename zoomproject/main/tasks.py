@@ -6,6 +6,15 @@ file_name = "log.json"
 
 ADMIN_DOMAINS = ["vertexglobalservices.com", "vertexcosmos.com"]
 
+EVENTS = {
+    "meeting.participant_joined_breakout_room": "Joined Breakout Room",
+    "meeting.participant_left_breakout_room": "Left Breakout Room",
+    "meeting.participant_joined": "Joined Meeting",
+    "meeting.participant_left": "Left Meeting",
+    "meeting.started": "Meeting Started",
+    "meeting.ended": "Meeting Ended"
+}
+
 
 def get_or_create_participant(meeting_info, meeting_obj):
 
@@ -65,6 +74,7 @@ def handle_queue(self, request_data):
         file_dict["meeting_id"] = meeting_info["id"]
         file_dict["meeting_duration"] = meeting_info["duration"]
         file_dict["meeting_host_id"] = meeting_info["host_id"]
+        file_dict["event_label"] = EVENTS.get(request_data["event"], "Event Name")
 
         meeting_obj = Meeting.objects.filter(uuid=meeting_info["uuid"], meeting_id=meeting_info["id"]).first()
 
