@@ -1,0 +1,13 @@
+[Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/ZoomApp/zoomproject
+ExecStart=/home/ubuntu/ZoomApp/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/run/gunicorn.sock zoomproject.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

@@ -7,7 +7,6 @@ server {
     }
 
     location / {
-        #root /home/www/public_html/shikhartp.in/public/;
         include proxy_params;
         proxy_pass http://unix:/run/gunicorn.sock;
     }
