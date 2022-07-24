@@ -18,7 +18,7 @@ def get_or_create_participant(meeting_info, meeting_obj):
             recruiter = True
 
     participant = Participant.objects.filter(
-        participant_id=meeting_info["participant"]["id"],
+        participant_id=meeting_info["participant"]["user_id"],
         meeting__uuid=meeting_info["uuid"]
     ).first()
 
@@ -27,7 +27,7 @@ def get_or_create_participant(meeting_info, meeting_obj):
         participant = Participant.objects.create(
             email=meeting_info["participant"]["email"],
             name=meeting_info["participant"]["user_name"],
-            participant_id=meeting_info["participant"]["id"],
+            participant_id=meeting_info["participant"]["user_id"],
             meeting=meeting_obj,
             join_time=meeting_info["participant"]["join_time"],
             is_recruiter=recruiter
