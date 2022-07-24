@@ -54,6 +54,9 @@ def prepare_participant_data(file_dict, meeting_info, meeting_obj):
     file_dict["active_recruiter_count"] = meeting_obj.active_recruiter_count
     file_dict["active_participant_breakout_count"] = meeting_obj.active_participant_breakout_count
     file_dict["active_recruiter_breakout_count"] = meeting_obj.active_recruiter_breakout_count
+    file_dict["total_participant_count"] = Participant.objects.filter(
+        meeting__uuid=meeting_obj.uuid
+    ).values('name').distinct().count()
     return file_dict
 
 
