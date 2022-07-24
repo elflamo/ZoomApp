@@ -87,11 +87,11 @@ def handle_queue(self, request_data):
         elif request_data["event"] == "meeting.participant_joined":
 
             participant, created, recruiter = get_or_create_participant(meeting_info, meeting_obj)
-            # if created:
-            if recruiter:
-                meeting_obj.active_recruiter_count += 1
-            else:
-                meeting_obj.active_participant_count += 1
+            if created:
+                if recruiter:
+                    meeting_obj.active_recruiter_count += 1
+                else:
+                    meeting_obj.active_participant_count += 1
             meeting_obj.save()
 
             file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
