@@ -9,3 +9,8 @@ venv
 .idea/
 *.out
 migrations
+*log.json
+*/zoomproject/worker.log
+*/zoomproject/Exception.txt
+*/zoomproject/log.json
+*/zoomproject/static

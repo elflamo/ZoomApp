@@ -1,6 +1,7 @@
 from zoomproject.celery import app
 import json
 from main.models import Meeting, Participant
+from datetime import datetime
 
 file_name = "log.json"
 
@@ -96,6 +97,9 @@ def handle_queue(self, request_data):
 
             file_dict["meeting_topic"] = meeting_info["topic"]
             file_dict["meeting_start_time"] = meeting_info["start_time"]
+            dt = datetime.strptime(meeting_info["start_time"], '%Y-%m-%dT%H:%M:%S%fZ')
+            file_dict["vro_entry"] = dt.strftime('%b %d, %Y @ %H:%M:%S')
+            file_dict["vro_exit"] = ""
 
         elif request_data["event"] == "meeting.participant_joined":
 
@@ -110,6 +114,9 @@ def handle_queue(self, request_data):
             file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
             file_dict["participant_join_time"] = meeting_info["participant"]["join_time"]
             file_dict["participant_leave_time"] = ""
+            dt = datetime.strptime(meeting_info["participant"]["join_time"], '%Y-%m-%dT%H:%M:%S%fZ')
+            file_dict["vro_entry"] = dt.strftime('%b %d, %Y @ %H:%M:%S')
+            file_dict["vro_exit"] = ""
 
         elif request_data["event"] == "meeting.participant_left":
 
@@ -125,6 +132,10 @@ def handle_queue(self, request_data):
             file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
             file_dict["participant_leave_time"] = meeting_info["participant"]["leave_time"]
             file_dict["participant_join_time"] = participant.join_time
+            dt = datetime.strptime(participant.join_time, '%Y-%m-%dT%H:%M:%S%fZ')
+            dt_leave = datetime.strptime(meeting_info["participant"]["leave_time"], '%Y-%m-%dT%H:%M:%S%fZ')
+            file_dict["vro_entry"] = dt.strftime('%b %d, %Y @ %H:%M:%S')
+            file_dict["vro_exit"] = dt_leave.strftime('%b %d, %Y @ %H:%M:%S')
 
         elif request_data["event"] == "meeting.participant_joined_breakout_room":
 
@@ -144,6 +155,9 @@ def handle_queue(self, request_data):
             file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
             file_dict["participant_join_time"] = meeting_info["participant"]["join_time"]
             file_dict["participant_leave_time"] = ""
+            dt = datetime.strptime(meeting_info["participant"]["join_time"], '%Y-%m-%dT%H:%M:%S%fZ')
+            file_dict["vro_entry"] = dt.strftime('%b %d, %Y @ %H:%M:%S')
+            file_dict["vro_exit"] = ""
 
         elif request_data["event"] == "meeting.participant_left_breakout_room":
 
@@ -162,6 +176,10 @@ def handle_queue(self, request_data):
             file_dict = prepare_participant_data(file_dict, meeting_info, meeting_obj)
             file_dict["participant_join_time"] = participant.join_time
             file_dict["participant_leave_time"] = meeting_info["participant"]["leave_time"]
+            dt = datetime.strptime(participant.join_time, '%Y-%m-%dT%H:%M:%S%fZ')
+            dt_leave = datetime.strptime(meeting_info["participant"]["leave_time"], '%Y-%m-%dT%H:%M:%S%fZ')
+            file_dict["vro_entry"] = dt.strftime('%b %d, %Y @ %H:%M:%S')
+            file_dict["vro_exit"] = dt_leave.strftime('%b %d, %Y @ %H:%M:%S')
 
         elif request_data["event"] == "meeting.ended":
             meeting_obj.end_time = meeting_info["end_time"]
@@ -169,6 +187,10 @@ def handle_queue(self, request_data):
 
             file_dict["meeting_topic"] = meeting_info["topic"]
             file_dict["meeting_end_time"] = meeting_info["end_time"]
+            dt = datetime.strptime(meeting_obj.start_time, '%Y-%m-%dT%H:%M:%S%fZ')
+            dt_leave = datetime.strptime(meeting_info["end_time"], '%Y-%m-%dT%H:%M:%S%fZ')
+            file_dict["vro_entry"] = dt.strftime('%b %d, %Y @ %H:%M:%S')
+            file_dict["vro_exit"] = dt_leave.strftime('%b %d, %Y @ %H:%M:%S')
 
         with open(file_name, "a") as file:
             file.write(f"{json.dumps(file_dict)}\n")
